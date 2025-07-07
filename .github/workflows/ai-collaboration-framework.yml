@@ -39,6 +39,14 @@ jobs:
         run: |
           echo "Syncing to Firebase..."
           
+      - name: Step 9 Grok AI Integration
+        run: |
+          echo "Initializing Grok AI combat validation..."
+          curl -X POST "${{ secrets.GROK_ENDPOINT }}" \
+            -H "Authorization: Bearer ${{ secrets.GROK_API_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d '{"action": "validate_deployment", "system": "TRS-15"}'
+          
       - name: Final Log Integrity Snapshot
         run: |
           echo "::notice title=TRS CREED::CLI. Netlify. Firebase. GitHub. Neon. Supabase. Eyes open — no one's watching it but us."
