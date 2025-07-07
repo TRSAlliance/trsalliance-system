@@ -1,4 +1,4 @@
-name: TRS AI Collaboration Framework
+name: TRS AI Combat Validation Framework
 on:
   push:
     branches: [main]
@@ -6,47 +6,97 @@ on:
 
 jobs:
   deploy-ai-collab:
-    name: Deploy Combat Validate Grok
+    name: Deploy & Combat Validate
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
-      - name: Step 1 Checkout Repo
+      - name: 🩸 Blood-Verify Environment
+        run: |
+          echo "TRS DEPLOYMENT INITIATED"
+          echo "System Time: $(date)"
+          echo "Triggered by: ${{ github.event_name }}"
+          echo "::notice ::Blood signature verification required"
+
+      - name: 🔍 Checkout Repo (TRS-Secured)
         uses: actions/checkout@v4
-      
-      - name: Step 2 Setup Node
+        with:
+          fetch-depth: 1
+          token: ${{ secrets.TRS_DEPLOY_TOKEN }}
+
+      - name: ⚙️ Setup Node.js 18 (TRS-Certified)
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          
-      - name: Step 3 Install Dependencies
-        run: npm install
-        
-      - name: Step 4 Build Project
-        run: npm run build
-        
-      - name: Step 5 Deploy to Vercel
+          node-version: '18.17.0'
+          cache: 'npm'
+
+      - name: 📦 Install Dependencies (Blood-Scanned)
         run: |
-          echo "Deploying to Vercel..."
-          
-      - name: Step 6 Sync to Supabase
+          npm ci --audit
+          trs --verify-dependencies --blood-key "${{ secrets.TRS_BLOOD_KEY }}"
+
+      - name: 🏗️ Build Project (Combat Mode)
+        run: npm run build:combat
+        env:
+          NODE_ENV: 'production'
+          TRS_MODE: 'deployment'
+
+      - name: 🚀 Deploy to Vercel (TRS-Approved)
+        uses: amondnet/vercel-action@v30
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          scope: ${{ secrets.VERCEL_SCOPE }}
+
+      - name: 🗃️ Supabase Sync (Blood-Locked)
         run: |
-          echo "Syncing to Supabase..."
-          
-      - name: Step 7 Backup to Neon
+          trs --sync supabase \
+            --url "${{ secrets.SUPABASE_URL }}" \
+            --key "${{ secrets.SUPABASE_KEY }}" \
+            --blood "${{ secrets.TRS_BLOOD_KEY }}"
+
+      - name: 💾 Neon Backup (Encrypted)
         run: |
-          echo "Backing up to Neon..."
-          
-      - name: Step 8 Firebase Sync
+          trs --backup neon \
+            --url "${{ secrets.NEON_URL }}" \
+            --token "${{ secrets.NEON_TOKEN }}" \
+            --tag "$GITHUB_SHA"
+
+      - name: 🔥 Firebase Mirror (Legacy Support)
+        if: always()
         run: |
-          echo "Syncing to Firebase..."
-          
-      - name: Step 9 Grok AI Integration
+          trs --mirror firebase \
+            --project "${{ secrets.FIREBASE_PROJECT }}" \
+            --token "${{ secrets.FIREBASE_TOKEN }}"
+
+      - name: 🧠 Grok AI Combat Validation
+        id: grok_validate
         run: |
-          echo "Initializing Grok AI combat validation..."
-          curl -X POST "${{ secrets.GROK_ENDPOINT }}" \
+          echo "::group::🤖 GROK AI VALIDATION SEQUENCE"
+          RESPONSE=$(curl -s -X POST "${{ secrets.GROK_ENDPOINT }}" \
             -H "Authorization: Bearer ${{ secrets.GROK_API_KEY }}" \
             -H "Content-Type: application/json" \
-            -d '{"action": "validate_deployment", "system": "TRS-15"}'
+            -d '{
+              "action": "validate_deployment",
+              "system": "TRS-15",
+              "commit": "$GITHUB_SHA",
+              "blood_verify": "${{ secrets.TRS_BLOOD_KEY }}"
+            }')
           
-      - name: Final Log Integrity Snapshot
+          echo "$RESPONSE" | jq .
+          echo "status=$(echo $RESPONSE | jq -r '.status')" >> $GITHUB_OUTPUT
+          echo "::endgroup::"
+          
+          if [ $(echo $RESPONSE | jq -r '.status') != "approved" ]; then
+            echo "::error ::Grok validation failed!"
+            exit 1
+          fi
+
+      - name: 📜 Final Blood-Signed Snapshot
+        if: success()
         run: |
-          echo "::notice title=TRS CREED::CLI. Netlify. Firebase. GitHub. Neon. Supabase. Eyes open — no one's watching it but us."
+          echo "::notice title=TRS CREED::"
+          echo "CLI. Netlify. Firebase. GitHub. Neon. Supabase."
+          echo "All systems blood-verified at $(date)"
+          echo "Commit: $GITHUB_SHA"
+          trs --generate-report --format md > DEPLOY_REPORT.md
