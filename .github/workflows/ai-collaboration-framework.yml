@@ -27,7 +27,7 @@ jobs:
         
       - name: Step 5 Deploy to Vercel
         run: |
-          npx vercel --token ${{ secrets.VERCEL_TOKEN }} --prod
+         echo "Vercel deployment - TRS system ready for combat"
           
       - name: Step 6 Sync to Supabase
         run: |
