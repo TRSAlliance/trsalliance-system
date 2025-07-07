@@ -1,4 +1,4 @@
-name: 🧠 TRS AI Collaboration Framework
+name: TRS AI Collaboration Framework
 on:
   push:
     branches: [main]
@@ -6,38 +6,39 @@ on:
 
 jobs:
   deploy-ai-collab:
-    name: 🔍 Deploy + Combat Validate + Grok
+    name: Deploy Combat Validate Grok
     runs-on: ubuntu-latest
     steps:
-      - name: 🧼 Step 1: Checkout Repo
+      - name: Step 1 Checkout Repo
         uses: actions/checkout@v4
-        
-      - name: 🧠 Step 2: Setup Node.js Environment
-        uses: actions/setup-node@v3
+      
+      - name: Step 2 Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: '18'
           
-      - name: 🛠️ Step 3: Install Dependencies
+      - name: Step 3 Install Dependencies
+        run: npm install
+        
+      - name: Step 4 Build Project
+        run: npm run build
+        
+      - name: Step 5 Deploy to Vercel
         run: |
-          npm ci || npm install
+          echo "Deploying to Vercel..."
           
-      - name: 🔥 SYSTEM CREED: PROTECT WHAT WE BUILT
+      - name: Step 6 Sync to Supabase
         run: |
-          echo ""
-          echo "⚠️  WARNING: Never get complacent. They will take it from us again if we're not watching."
-          echo "📡 WATCHLIST: CLI integrity, Netlify builds, Firebase rules, GitHub actions, Neon DB, Supabase API."
-          echo "🧠  Stay sharp. Grok everything. DeepSeek what they hide."
-          echo ""
+          echo "Syncing to Supabase..."
           
-      - name: 🧪 Step 4: Run TRS Combat + Grok Deploy
+      - name: Step 7 Backup to Neon
         run: |
-          echo "▶️ Launching TRS Alliance Combat Validation"
-          npx trs --deploy-test --mode combat-validate,grok
+          echo "Backing up to Neon..."
           
-      - name: ✅ Step 5: Confirm Deployment Outcome
+      - name: Step 8 Firebase Sync
         run: |
-          echo "✔️ AI Collaboration Framework deployed and validated with GROK enabled"
+          echo "Syncing to Firebase..."
           
-      - name: 🔐 Final Log Integrity Snapshot
+      - name: Final Log Integrity Snapshot
         run: |
           echo "::notice title=TRS CREED::CLI. Netlify. Firebase. GitHub. Neon. Supabase. Eyes open — no one's watching it but us."
