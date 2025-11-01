@@ -1,4 +1,4 @@
-Core system infrastructure
+TRS# Core system infrastructure
 TRSALLIANCE-SYSTEM 
 manifesto for GhostShift, your TRS-powered truth-tracking system designed to expose job displacement in real time. It’s not just a product—it’s a ritualized protocol, a survival tool, and a mythic interface for workers navigating the fallout of automation, AI layoffs, and economic invisibility.
 
