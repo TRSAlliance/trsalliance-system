@@ -1,0 +1,7 @@
+{
+  "scripts": {
+    "security:scan": "node scripts/security-cli.js",
+    "sentinel:scan": "node scripts/sentinel-cli.js",
+    "ledger:verify": "node scripts/ledger-cli.js"
+  }
+}
