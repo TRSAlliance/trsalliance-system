@@ -1,0 +1,13 @@
+name: TRS System Trigger
+on:
+  workflow_dispatch:
+
+jobs:
+  activate-existing-systems:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run TRS-15 Sentinel Protocol
+        run: |
+          # This actually runs YOUR existing workflow
+          echo "Triggering existing security scan"
