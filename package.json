@@ -1,9 +1,23 @@
-"scripts": {
-  "dev": "vite",
-  "build": "vite build",
-  "preview": "vite preview",
+{
+  "name": "trsalliance-system",
+  "version": "1.0.0",
+  "description": "TRS Alliance System — modular site, CLI, and GhostShift nodes",
+  "type": "module",
 
-  "security:scan": "node scripts/security-cli.js",
-  "sentinel:scan": "node scripts/sentinel-cli.js",
-  "ledger:verify": "node scripts/ledger-cli.js"
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+
+    "security:scan": "node scripts/security-cli.js",
+    "sentinel:scan": "node scripts/sentinel-cli.js",
+    "ledger:verify": "node scripts/ledger-cli.js"
+  },
+
+  "dependencies": {
+  },
+
+  "devDependencies": {
+    "vite": "^5.2.0"
+  }
 }
