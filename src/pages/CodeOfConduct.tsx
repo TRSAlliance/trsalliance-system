@@ -1,0 +1,1 @@
+export default function CodeOfConduct() { return <div>📜 Code</div>; }

@@ -1,0 +1,1 @@
+export default function GhostPing() { return <div>👻 GhostPing Active</div>; }

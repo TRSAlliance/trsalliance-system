@@ -1,0 +1,1 @@
+import GhostPing from "./pages/index"; export default function App() { return <GhostPing />; }
