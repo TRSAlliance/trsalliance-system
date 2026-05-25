@@ -1,22 +1,54 @@
+# =================================================================================
+# TRS ALLIANCE HARDENED DEPLOYMENT GATEWAY
+# Baseline Alignment: c0f6c23 | Status: PRODUCTION LOCKDOWN
+# =================================================================================
+
 [build]
-publish = "./"
+  command = "npm run build"
+  publish = "dist"
+  # Eradicates blind root directory exposure. Forces structural compilation.
+
+[context.production]
+  branch = "main"
+  autoPublish = false
+  # Shuts the gate. Prevents unauthorized auto-deploys on raw pushes.
+
+# Hardened Security Edge Enforcements
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; connect-src 'self' https://*.supabase.co"
+    Cache-Control = "public, max-age=3600, must-revalidate"
+    X-TRS-Kernel-Status = "LOCKED"
+    X-TRS-Deployment-Gate = "ADMISSIBILITY-ENFORCED"
+
+# Redirect Security (Legacy Support with Gate Lock)
+[[redirects]]
+  from = "/feedback"
+  to = "/feedback/index.html"
+  status = 200
 
 [[redirects]]
-from = "/feedback"
-to = "/feedback/index.html"
-status = 200
+  from = "/ghostshift"
+  to = "/ghostshift/index.html"
+  status = 200
 
 [[redirects]]
-from = "/ghostshift"
-to = "/ghostshift/index.html"
-status = 200
+  from = "/pitch-deck"
+  to = "/pitch-deck/index.html"
+  status = 200
 
 [[redirects]]
-from = "/pitch-deck"
-to = "/pitch-deck/index.html"
-status = 200
+  from = "/pilot"
+  to = "/pilot-ops/index.html"
+  status = 200
 
+# Catch-all redirect to prevent directory traversal
 [[redirects]]
-from = "/pilot"
-to = "/pilot-ops/index.html"
-status = 200
+  from = "/*"
+  to = "/index.html"
+  status = 404
