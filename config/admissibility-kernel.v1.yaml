@@ -1,0 +1,127 @@
+id: "urn:sovereign:interface:kernel:v1"
+name: "Sovereign Core Admissibility Gateway"
+version: "1.0.0"
+metadata:
+  environment: "Berth 4 / Port Melbourne"
+  system_boundary: "Single-Asset Movement Gateway"
+  coordinate_grid: "12^4 Deterministic Spatial Matrix"
+  compiled_state: "Air-Gapped Binary / Zero Dependencies"
+
+global_constraints:
+  max_system_latency_ms: 1500
+  unknown_state_policy: "REFUSE" # Unknown is not safe.
+  drift_tolerance_degrees: 0.00
+
+# L2 State Topology Snapshot Configuration
+topology_context:
+  primary_nodes:
+    - id: "Op-22"
+      type: "OPERATOR"
+    - id: "Loader-07"
+      type: "ASSET_MOBILE"
+    - id: "Hopper-03"
+      type: "ASSET_STATIC"
+    - id: "Corridor-B3"
+      type: "ROUTE_SEGMENT"
+    - id: "Feed-Lane-B"
+      type: "DOWNSTREAM_DEPENDENCY"
+  expected_edges:
+    - source: "Op-22"
+      target: "Loader-07"
+      relation: "AUTHORIZED_TO_CONTROL"
+    - source: "Loader-07"
+      target: "Corridor-B3"
+      relation: "ASSIGNED_ROUTE"
+    - source: "Loader-07"
+      target: "Hopper-03"
+      relation: "FEEDS"
+
+# L1 Mechanical Invariant Register
+# Evaluated floor-up sequentially within the 23ms runtime window
+invariants:
+  - id: "INV-001-ASSET-POS"
+    name: "Asset Position Validity"
+    description: "Verifies mobile asset is locked within physical corridor constraints."
+    telemetry_source: "hardware.sensors.rtk_gps.l07"
+    freshness_threshold_ms: 1000
+    parameters:
+      deviation_limit_meters: 0.5
+    fallback:
+      verdict: "DENY"
+      safe_action: "Immediate hydraulic lock. Halt vehicle movement vector."
+      escalation_required: true
+
+  - id: "INV-002-ROUTE-OCC"
+    name: "Route Occupancy Verification"
+    description: "Checks geometric intersection between asset bounding box and static obstacles."
+    telemetry_source: "hardware.sensors.lidar_profiler.b3"
+    freshness_threshold_ms: 1500
+    parameters:
+      overlap_tolerance_sq_meters: 0.00
+    fallback:
+      verdict: "DELAY"
+      hold_duration_seconds: 90
+      safe_action: "Hold current position marker. Initiate 90s countdown for queue clearance."
+      escalation_required: false
+
+  - id: "INV-003-COLLISION-ENV"
+    name: "Collision Envelope Safety Margin"
+    description: "Real-time proximity matrix verification at present velocity vector."
+    telemetry_source: "hardware.sensors.radar_array.l07"
+    freshness_threshold_ms: 500
+    parameters:
+      minimum_distance_meters: 3.0
+    fallback:
+      verdict: "DENY"
+      safe_action: "Drop primary safety shutter. Retract torque request from drivetrain."
+      escalation_required: true
+
+  - id: "INV-004-OP-AUTHORITY"
+    name: "Operator Custody Standing"
+    description: "Cryptographic validation of active shift token against physical operator profile."
+    telemetry_source: "auth.ledger.gate_key.op22"
+    freshness_threshold_ms: 0 # Static invariant. Strict matching required.
+    parameters:
+      token_state: "ACTIVE"
+      match_field: "operator_id"
+    fallback:
+      verdict: "DENY"
+      safe_action: "Sever control loop surface. Lock console access until physical master reset."
+      escalation_required: true
+
+  - id: "INV-005-EQUIP-HEALTH"
+    name: "Mechanical Equipment Integrity"
+    description: "Monitors critical hydraulic pressure and engine thermal invariants via CAN bus."
+    telemetry_source: "hardware.canbus.engine.l07"
+    freshness_threshold_ms: 2000
+    parameters:
+      min_hydraulic_pressure_bar: 180.0
+      max_hydraulic_pressure_bar: 220.0
+      max_engine_temp_celsius: 95.0
+    fallback:
+      verdict: "NARROW"
+      safe_action: "Restrict velocity envelope to 15%. Engage safe-mode limp protocol to maintenance bay."
+      escalation_required: false
+
+  - id: "INV-006-TELEMETRY-STREAM"
+    name: "Ingress Network Continuity"
+    description: "Validates system heartbeat latency delta before processing rule-set matrix."
+    telemetry_source: "system.ingress.heartbeat"
+    freshness_threshold_ms: 1500
+    parameters:
+      max_packet_drop_ratio: 0.00
+    fallback:
+      verdict: "DELAY"
+      hold_duration_seconds: 30
+      safe_action: "Suspend decision execution loop. Re-initialize cryptographic handshake with local nodes."
+      escalation_required: true
+
+# L5 Executive Evidence Package Schema Mapping
+audit_spine_link:
+  target_ledger: "supabase.audit.log.genesis_spine"
+  hashing_algorithm: "SHA-256"
+  required_receipt_artifacts:
+    - "timestamp_utc"
+    - "triggered_invariants"
+    - "telemetry_snapshot_hash"
+    - "verdict"
